@@ -1,3 +1,17 @@
+#######################################################################################################################
+
+2.1.0:
+1. Add setcolor(), make interface more colorful.
+
+#######################################################################################################################
+
+2.0.0:
+1. Can select more difficulty instead of one difficulty.
+2. Now, first step is "sweeper", isn't spawn map.
+3. Fix print_game() print x & y ways, and print the numbers of mines and flags.
+4. Fix landboom_generate().
+
+#######################################################################################################################
 
 1.0.0:
 minesweeper compelet!!!
