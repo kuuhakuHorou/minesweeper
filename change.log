@@ -1,5 +1,11 @@
 #######################################################################################################################
 
+2.1.1:
+1. Add struct GAME to save the state of game, and remove some globla variable, including struct GAME, in funt_dif_*.c.
+2. Remove map_guess.
+
+#######################################################################################################################
+
 2.1.0:
 1. Add setcolor(), make interface more colorful.
 
