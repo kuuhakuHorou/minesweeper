@@ -9,6 +9,12 @@
 #define LINES_HARD 30
 #define COLS_HARD 16
 
+struct GAME{
+    int error;  //遊戲錯誤(輸入)
+    int over;   //遊戲結束
+    int flag;   //遊戲中旗子數量
+} game;
+
 //重要函式(important_funt.c)
 void color_set(int);    //改變顏色
 void game_dif_choose(void); //遊戲困難度選則
