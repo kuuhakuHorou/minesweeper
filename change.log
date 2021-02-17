@@ -1,5 +1,11 @@
 #######################################################################################################################
 
+2.1.2:
+1. Use dynamic array instead of globla variable, and combine funt_dif_*.c with game_content.c.
+2. struct GAME have more information.
+
+#######################################################################################################################
+
 2.1.1:
 1. Add struct GAME to save the state of game, and remove some globla variable, including struct GAME, in funt_dif_*.c.
 2. Remove map_guess.
