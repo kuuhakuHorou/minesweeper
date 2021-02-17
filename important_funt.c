@@ -7,7 +7,7 @@ void color_set(int color_num) {     //https://baike.baidu.com/item/SetConsoleTex
 }
 
 void game_dif_choose() {
-    int choose, error_in=0, game_end;
+    int choose, error_in=0;
     while (1) {
         printf("請問要玩怎樣的難度呢\n"
                "    簡單:1\n"
@@ -18,16 +18,22 @@ void game_dif_choose() {
         fflush(stdin);  //清理輸入緩衝區
         switch (choose) {
             case 1:
-                game_easy();
-                game_end=1;
+                game.lines=9;
+                game.cols=9;
+                game.landboom=10;
+                game_content();
                 break;
             case 2:
-                game_normal();
-                game_end=1;
+                game.lines=16;
+                game.cols=16;
+                game.landboom=40;
+                game_content();
                 break;
             case 3:
-                game_hard();
-                game_end=1;
+                game.lines=30;
+                game.cols=16;
+                game.landboom=99;
+                game_content();
                 break;
             default:
                 color_set(12);
@@ -37,7 +43,7 @@ void game_dif_choose() {
                 system("cls");  //刷新螢幕
                 break;
         }
-        if (game_end==1) {
+        if (game.over==1) {
             break;
         }
         
