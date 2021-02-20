@@ -14,7 +14,7 @@ void game_content() {   //遊戲內容
     print_game(map,map_mark);
     while (1) {
         if (game.error==0) {
-            gotoxy(45,1);
+            gotoxy(60,1);
             printf("請輸入你想做什麼(1:\"踩\"，2:標記): ");
             for (i=0;i<10;i++)
                 putchar(' ');
@@ -30,14 +30,14 @@ void game_content() {   //遊戲內容
                     mod_choose=2;
                     break;
                 default:
-                    gotoxy(50,5);
-                    color_set(12);
+                    gotoxy(60,2);
+                    color_set(252);
                     printf("輸入錯誤!請重新輸入!!");
                     color_set(7);
                     game.error=1;
                     mod_choose=0;   //一開始沒輸入錯誤但後面有時，防止跳入上一個選則
                     Sleep(3000);
-                    gotoxy(50,5);
+                    gotoxy(60,2);
                     for (i=0;i<21;i++)
                         putchar(' ');
                     break;
@@ -58,7 +58,8 @@ void game_content() {   //遊戲內容
         }
         
         if (game.over==1) {
-            gotoxy(50,11);
+            color_set(7);
+            gotoxy(60,2);
             break;
         }
     }
@@ -79,13 +80,13 @@ void game_start(int *map,int *map_mark) {     //遊戲開始設定
     while (1) {
         error=0;
         print_game(map,map_mark);
-        gotoxy(45,1);
+        gotoxy(60,1);
         printf("請先輸入一個座標(x y): ");
         scanf("%d%d", &enter_y, &enter_x);
         fflush(stdin);
         if (enter_x>game.cols||enter_x<1||enter_y>game.lines||enter_y<1) {
             error=1;
-            gotoxy(50,5);
+            gotoxy(60,2);
             color_set(252);
             printf("請不要亂輸入喔!");
             color_set(7);
@@ -150,7 +151,7 @@ void landboom_tester(int x,int y,int *map) { //測試旁邊八格地雷
 
 void mod_choose_1(int *map,int *map_mark) {   //"踩"
     int i, j, guess_x, guess_y, untreated_items;
-    gotoxy(45,2);
+    gotoxy(60,2);
     printf("請輸入你想踩哪(x y): ");
     for (i=0;i<10;i++)
         putchar(' ');
@@ -159,25 +160,25 @@ void mod_choose_1(int *map,int *map_mark) {   //"踩"
     scanf("%d%d", &guess_y, &guess_x);
     fflush(stdin);  //清除輸入緩衝區，以防亂輸入
     if (guess_x>game.cols||guess_x<1||guess_y>game.lines||guess_y<1) {    //超出地雷範圍
-        gotoxy(50,5);
-        color_set(12);
+        gotoxy(60,3);
+        color_set(252);
         printf("輸入錯誤!請重新輸入!!");
         color_set(7);
         game.error=1;
         Sleep(3000);
-        gotoxy(50,5);
+        gotoxy(60,3);
         for (i=0;i<21;i++)
             putchar(' ');
         return;
     }
     else if (*(map_mark+game.cols*(guess_y-1)+(guess_x-1))==1) {
-        gotoxy(50,5);
-        color_set(12);
+        gotoxy(60,3);
+        color_set(252);
         printf("你不能踩標記的地喔!");
         color_set(7);
         game.error=1;
         Sleep(3000);
-        gotoxy(50,5);
+        gotoxy(60,3);
         for (i=0;i<21;i++)
             putchar(' ');
         return;
@@ -192,7 +193,8 @@ void mod_choose_1(int *map,int *map_mark) {   //"踩"
             }
         }
         print_game(map,map_mark);
-        gotoxy(50,10);
+        gotoxy(60,1);
+        color_set(192);
         printf("你輸了");
         game.over=1;
         return;
@@ -218,7 +220,8 @@ void mod_choose_1(int *map,int *map_mark) {   //"踩"
             }
         }
         print_game(map,map_mark);
-        gotoxy(50,10);
+        gotoxy(60,1);
+        color_set(224);
         printf("你贏了");
         game.over=1;
         return;
@@ -228,7 +231,7 @@ void mod_choose_1(int *map,int *map_mark) {   //"踩"
 void mod_choose_2(int *map,int *map_mark) {   //標記
     int i, mark_x, mark_y;
     int *p_mark;
-    gotoxy(45,2);
+    gotoxy(60,2);
     printf("請輸入你想標記哪(x y): ");
     for (i=0;i<10;i++)
         putchar(' ');
@@ -237,13 +240,13 @@ void mod_choose_2(int *map,int *map_mark) {   //標記
     scanf("%d%d", &mark_y, &mark_x);
     fflush(stdin);  //清除輸入緩衝區，以防亂輸入
     if (mark_x>game.cols||mark_x<1||mark_y>game.lines||mark_y<1) {//超出地雷範圍
-        gotoxy(50,5);
-        color_set(12);
+        gotoxy(60,3);
+        color_set(252);
         printf("輸入錯誤!請重新輸入!!");
         color_set(7);
         game.error=1;
         Sleep(3000);
-        gotoxy(50,5);
+        gotoxy(60,3);
         for (i=0;i<21;i++)
             putchar(' ');
         return;
@@ -345,5 +348,8 @@ void print_game(int *map,int *map_mark) { //介面
             color_set(7);
         }
     }
-    putchar('\n');
+    for (i=1;i<=36;i++) {
+        gotoxy(58,i);
+        printf("|");
+    }
 }
