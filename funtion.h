@@ -20,6 +20,7 @@ struct GAME{
 
 //重要函式(important_funt.c)
 void color_set(int);    //改變顏色
+void degree_of_difficulty(void);
 void game_dif_choose(void); //遊戲困難度選則
 void gotoxy(int,int);   //指定座標
 

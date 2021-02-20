@@ -1,5 +1,11 @@
 #######################################################################################################################
 
+2.2.0:
+1. Add customzied difficulty, now it can custom the information of map
+2. Adjust interface
+
+#######################################################################################################################
+
 2.1.2:
 1. Use dynamic array instead of globla variable, and combine funt_dif_*.c with game_content.c.
 2. struct GAME have more information.
