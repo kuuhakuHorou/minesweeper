@@ -6,16 +6,16 @@ void color_set(int color_num) {     //https://baike.baidu.com/item/SetConsoleTex
     SetConsoleTextAttribute(hOut,color_num);
 }
 
-void degree_of_difficulty() {
+void degree_of_difficulty() {       //自訂難度
     int choose, i, change, exit, choose_exit;
     while (1) {
-        if (game.lines==0) {
+        if (set.lines==0) {
             choose=1;
         }
-        else if (game.cols==0) {
+        else if (set.cols==0) {
             choose=2;
         }
-        else if (game.landboom==0) {
+        else if (set.landboom==0) {
             choose=3;
         }
         switch (choose) {
@@ -29,9 +29,9 @@ void degree_of_difficulty() {
                 for (i=0;i<10;i++) {
                     putchar('\b');
                 }
-                scanf("%d", &game.lines);
+                scanf("%d", &set.lines);
                 fflush(stdin);
-                if (game.lines<9||game.lines>30) {
+                if (set.lines<9||set.lines>30) {
                     gotoxy(30,6);
                     color_set(252);
                     printf("請不要超過範圍喔!");
@@ -60,9 +60,9 @@ void degree_of_difficulty() {
                 for (i=0;i<10;i++) {
                     putchar('\b');
                 }
-                scanf("%d", &game.cols);
+                scanf("%d", &set.cols);
                 fflush(stdin);
-                if (game.cols<9||game.cols>24) {
+                if (set.cols<9||set.cols>24) {
                     gotoxy(30,6);
                     color_set(252);
                     printf("請不要超過範圍喔!");
@@ -84,16 +84,16 @@ void degree_of_difficulty() {
             case 3:
             while (1) {
                 gotoxy(30,3);
-                printf("請輸入炸彈數(最小10,最大%-3d): ", (game.lines-1)*(game.cols-1));
+                printf("請輸入炸彈數(最小10,最大%-3d): ", (set.lines-1)*(set.cols-1));
                 for (i=0;i<10;i++) {
                     putchar(' ');
                 }
                 for (i=0;i<10;i++) {
                     putchar('\b');
                 }
-                scanf("%d", &game.landboom);
+                scanf("%d", &set.landboom);
                 fflush(stdin);
-                if (game.landboom<10||game.landboom>(game.lines-1)*(game.cols-1)) {
+                if (set.landboom<10||set.landboom>(set.lines-1)*(set.cols-1)) {
                     gotoxy(30,6);
                     color_set(252);
                     printf("請不要超過範圍喔!");
@@ -113,7 +113,7 @@ void degree_of_difficulty() {
             }
             break;
         }
-        if (game.lines!=0&&game.cols!=0&&game.landboom!=0) {
+        if (set.lines!=0&&set.cols!=0&&set.landboom!=0) {
             while (1) {
                 char decide;
                 gotoxy(30,4);
@@ -157,19 +157,19 @@ void degree_of_difficulty() {
                             }
                             else if (change==1) {
                                 change=0;
-                                game.lines=0;
+                                set.lines=0;
                                 choose_exit=1;
                                 break;
                             }
                             else if (change==2) {
                                 change=0;
-                                game.cols=0;
+                                set.cols=0;
                                 choose_exit=1;
                                 break;
                             }
                             else if (change==3) {
                                 change=0;
-                                game.landboom=0;
+                                set.landboom=0;
                                 choose_exit=1;
                                 break;
                             }
@@ -210,8 +210,8 @@ void degree_of_difficulty() {
     }
 }
 
-void game_dif_choose() {
-    int choose, error_in=0;
+void game_dif_choose() {        //遊戲難度選則
+    int choose, error_in=0, over, i;
     while (1) {
         printf("請問要玩怎樣的難度呢\n"
                "    簡單:1\n"
@@ -223,21 +223,21 @@ void game_dif_choose() {
         fflush(stdin);  //清理輸入緩衝區
         switch (choose) {
             case 1:
-                game.lines=9;
-                game.cols=9;
-                game.landboom=10;
+                set.lines=9;
+                set.cols=9;
+                set.landboom=10;
                 game_content();
                 break;
             case 2:
-                game.lines=16;
-                game.cols=16;
-                game.landboom=40;
+                set.lines=16;
+                set.cols=16;
+                set.landboom=40;
                 game_content();
                 break;
             case 3:
-                game.lines=30;
-                game.cols=16;
-                game.landboom=99;
+                set.lines=30;
+                set.cols=16;
+                set.landboom=99;
                 game_content();
                 break;
             case 4:
@@ -252,7 +252,52 @@ void game_dif_choose() {
                 system("cls");  //刷新螢幕
                 break;
         }
-        if (game.over==1) {
+        while (game.over==1) {
+            gotoxy(60,2);
+            printf("你還想要繼續玩嗎(Y/N) ");
+            for (i=0;i<10;i++) {
+                putchar(' ');
+            }
+            for (i=0;i<10;i++) {
+                putchar('\b');
+            }
+            scanf("%c", &game.continue_q);
+            fflush(stdin);
+            switch (game.continue_q) {
+                case 'y':
+                case 'Y':
+                    game.continue_q=1;
+                    gotoxy(60,3);
+                    printf("那就重新開始囉");
+                    Sleep(1000);
+                break;
+                case 'n':
+                case 'N':
+                    over=1;
+                    gotoxy(60,3);
+                    printf("那就掰掰囉");
+                    Sleep(1000);
+                break;
+                default:
+                    gotoxy(60,3);
+                    color_set(252);
+                    printf("請不要亂輸入喔");
+                    Sleep(3000);
+                    gotoxy(60,3);
+                    color_set(7);
+                    for (i=0;i<14;i++) {
+                        putchar(' ');
+                    }
+                break;
+            }
+            if (over==1||game.continue_q==1) {
+                break;
+            }
+        }
+        if (game.continue_q==1) {
+            system("cls");
+        }
+        else if (over==1) {
             break;
         }
 
