@@ -13,10 +13,14 @@ struct GAME{
     int error;  //遊戲錯誤(輸入)
     int over;   //遊戲結束
     int flag;   //遊戲中旗子數量
+    char continue_q;     //遊戲繼續詢問
+} game;
+
+struct SET{
     int lines;  //地圖幾行
     int cols;   //地圖幾列
     int landboom;   //地雷數量
-} game;
+} set;
 
 //重要函式(important_funt.c)
 void color_set(int);    //改變顏色

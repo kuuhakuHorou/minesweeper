@@ -1,8 +1,14 @@
 #######################################################################################################################
 
+2.3.0:
+1. Move some information in struct GAME to struct SET, and add new information in struct GAME.
+2. Add "play again?" when the game over.
+
+#######################################################################################################################
+
 2.2.0:
-1. Add customzied difficulty, now it can custom the information of map
-2. Adjust interface
+1. Add customzied difficulty, now it can custom the information of map.
+2. Adjust interface.
 
 #######################################################################################################################
 
