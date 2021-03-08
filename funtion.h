@@ -2,16 +2,18 @@
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>
-#define LINES_EASY 9
-#define COLS_EASY 9
-#define LINES_NORMAL 16
-#define COLS_NORMAL 16
-#define LINES_HARD 30
-#define COLS_HARD 16
+/*  #define LINES_EASY 9
+    #define COLS_EASY 9
+    #define LINES_NORMAL 16
+    #define COLS_NORMAL 16
+    #define LINES_HARD 30
+    #define COLS_HARD 16 */
+
+typedef enum {false, true} bool;
 
 struct GAME{
-    int error;  //遊戲錯誤(輸入)
-    int over;   //遊戲結束
+    bool error;  //遊戲錯誤(輸入)
+    bool over;   //遊戲結束
     int flag;   //遊戲中旗子數量
     char continue_q;     //遊戲繼續詢問
 } game;
@@ -31,7 +33,7 @@ void gotoxy(int,int);   //指定座標
 //遊戲內容(game_content.c)
 void game_content(void);    //遊戲內容
 void game_start(int *,int *);  //設定邊界
-void landboom_generate(int *,int *,int *);   //隨機生成地雷
+void landboom_generate(int,int,int *);   //隨機生成地雷
 void landboom_tester(int,int,int *);   //測試旁邊八格地雷
 void mod_choose_1(int *,int *);        //"踩"
 void mod_choose_2(int *,int *);        //標記
