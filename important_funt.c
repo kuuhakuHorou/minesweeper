@@ -3,104 +3,107 @@
 void color_set(int color_num) {     //https://baike.baidu.com/item/SetConsoleTextAttribute 顏色對應值
     HANDLE hOut;
     hOut=GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hOut,color_num);
+    SetConsoleTextAttribute(hOut, color_num);
 }
 
 void degree_of_difficulty() {       //自訂難度
-    int choose, i, change, exit, choose_exit;
-    while (1) {
-        if (set.lines==0) {
-            choose=1;
+    int i, choose, change;
+    bool exit = false, choose_exit = false, error = false;
+    do {
+        if (set.lines == 0) {
+            choose = 1;
         }
-        else if (set.cols==0) {
-            choose=2;
+        else if (set.cols == 0) {
+            choose = 2;
         }
-        else if (set.landboom==0) {
-            choose=3;
+        else if (set.landboom == 0) {
+            choose = 3;
         }
         switch (choose) {
             case 1:
-            while (1) {
+            do {
+                error = false;
                 gotoxy(30,1);
                 printf("請輸入長度x(最小9,最大30): ");
-                for (i=0;i<10;i++) {
+                for (i = 0; i < 10; i++) {
                     putchar(' ');
                 }
-                for (i=0;i<10;i++) {
+                for (i = 0; i < 10; i++) {
                     putchar('\b');
                 }
                 scanf("%d", &set.lines);
                 fflush(stdin);
-                if (set.lines<9||set.lines>30) {
+                if (set.lines < 9||set.lines > 30) {
+                    error = true;
                     gotoxy(30,6);
                     color_set(252);
                     printf("請不要超過範圍喔!");
                     Sleep(3000);
                     color_set(7);
                     gotoxy(30,1);
-                    for (i=0;i<35;i++) {
+                    for (i = 0; i < 35; i++) {
                         putchar(' ');
                     }
                     gotoxy(30,6);
-                    for (i=0;i<17;i++) {
+                    for (i = 0; i < 17; i++) {
                         putchar(' ');
                     }
                 }
-                else
-                    break;
-            }
+            } while (error);
             break;
             case 2:
-            while (1) {
+            do {
+                error = false;
                 gotoxy(30,2);
                 printf("請輸入寬度y(最小9,最大24): ");
-                for (i=0;i<10;i++) {
+                for (i = 0;i < 10; i++) {
                     putchar(' ');
                 }
-                for (i=0;i<10;i++) {
+                for (i = 0; i < 10; i++) {
                     putchar('\b');
                 }
                 scanf("%d", &set.cols);
                 fflush(stdin);
-                if (set.cols<9||set.cols>24) {
+                if (set.cols < 9||set.cols > 24) {
+                    error = true;
                     gotoxy(30,6);
                     color_set(252);
                     printf("請不要超過範圍喔!");
                     Sleep(3000);
                     color_set(7);
                     gotoxy(30,2);
-                    for (i=0;i<35;i++) {
+                    for (i = 0; i < 35; i++) {
                         putchar(' ');
                     }
                     gotoxy(30,6);
-                    for (i=0;i<17;i++) {
+                    for (i = 0; i < 17; i++) {
                         putchar(' ');
                     }
                 }
-                else
-                    break;
-            }
+            } while (error);
             break;
             case 3:
-            while (1) {
+            do {
+                error = false;
                 gotoxy(30,3);
                 printf("請輸入炸彈數(最小10,最大%-3d): ", (set.lines-1)*(set.cols-1));
-                for (i=0;i<10;i++) {
+                for (i = 0; i < 10; i++) {
                     putchar(' ');
                 }
-                for (i=0;i<10;i++) {
+                for (i = 0; i < 10; i++) {
                     putchar('\b');
                 }
                 scanf("%d", &set.landboom);
                 fflush(stdin);
-                if (set.landboom<10||set.landboom>(set.lines-1)*(set.cols-1)) {
+                if (set.landboom < 10||set.landboom > (set.lines-1)*(set.cols-1)) {
+                    error = true;
                     gotoxy(30,6);
                     color_set(252);
                     printf("請不要超過範圍喔!");
                     Sleep(3000);
                     color_set(7);
                     gotoxy(30,3);
-                    for (i=0;i<40;i++) {
+                    for (i = 0; i < 40; i++) {
                         putchar(' ');
                     }
                     gotoxy(30,6);
@@ -108,20 +111,18 @@ void degree_of_difficulty() {       //自訂難度
                         putchar(' ');
                     }
                 }
-                else
-                    break;
-            }
+            } while (error);
             break;
         }
-        if (set.lines!=0&&set.cols!=0&&set.landboom!=0) {
-            while (1) {
+        if (set.lines != 0&&set.cols != 0&&set.landboom != 0) {
+            do {
                 char decide;
                 gotoxy(30,4);
                 printf("有要調整的嗎?(Y/N) ");
-                for (i=0;i<10;i++) {
+                for (i = 0; i < 10; i++) {
                     putchar(' ');
                 }
-                for (i=0;i<10;i++) {
+                for (i = 0; i < 10; i++) {
                     putchar('\b');
                 }
                 scanf("%c", &decide);
@@ -129,59 +130,58 @@ void degree_of_difficulty() {       //自訂難度
                 switch (decide) {
                     case 'y':
                     case 'Y':
-                        while (1) {
+                        do {
+                            error = false;
                             gotoxy(30,5);
                             printf("請問需要調整哪裡呢?(1:長度 2:寬度 3:地雷數) ");
-                            for (i=0;i<10;i++) {
+                            for (i = 0; i < 10; i++) {
                                 putchar(' ');
                             }
-                            for (i=0;i<10;i++) {
+                            for (i = 0; i < 10; i++) {
                                 putchar('\b');
                             }
                             scanf("%d", &change);
                             fflush(stdin);
-                            if (change<1||change>3) {
+                            if (change < 1||change > 3) {
+                                error = true;
                                 gotoxy(30,6);
                                 color_set(252);
                                 printf("請不要亂輸入喔!");
                                 Sleep(3000);
                                 color_set(7);
                                 gotoxy(30,5);
-                                for (i=0;i<50;i++) {
+                                for (i = 0; i < 50; i++) {
                                     putchar(' ');
                                 }
                                 gotoxy(30,6);
-                                for (i=0;i<15;i++) {
+                                for (i = 0; i < 15; i++) {
                                     putchar(' ');
                                 }
                             }
-                            else if (change==1) {
-                                change=0;
-                                set.lines=0;
-                                choose_exit=1;
-                                break;
+                            else if (change == 1) {
+                                change = 0;
+                                set.lines = 0;
+                                choose_exit = true;
                             }
-                            else if (change==2) {
-                                change=0;
-                                set.cols=0;
-                                choose_exit=1;
-                                break;
+                            else if (change == 2) {
+                                change = 0;
+                                set.cols = 0;
+                                choose_exit = true;
                             }
-                            else if (change==3) {
-                                change=0;
-                                set.landboom=0;
-                                choose_exit=1;
-                                break;
+                            else if (change == 3) {
+                                change = 0;
+                                set.landboom = 0;
+                                choose_exit = true;
                             }
-                        }
+                        } while (error);
                     break;
                     case 'n':
                     case 'N':
                         gotoxy(30,6);
                         printf("那就開始遊戲囉");
                         Sleep(1000);
-                        choose_exit=1;
-                        exit=1;
+                        choose_exit = true;
+                        exit = true;
                     break;
                     default:
                         gotoxy(30,6);
@@ -190,29 +190,23 @@ void degree_of_difficulty() {       //自訂難度
                         Sleep(3000);
                         color_set(7);
                         gotoxy(30,4);
-                        for (i=0;i<25;i++) {
+                        for (i = 0; i < 25; i++) {
                             putchar(' ');
                         }
                         gotoxy(30,6);
-                        for (i=0;i<15;i++) {
+                        for (i = 0; i < 15; i++) {
                             putchar(' ');
                         }
                     break;
                 }
-                if (choose_exit==1) {
-                    break;
-                }
-            }
+            } while (!choose_exit);
         }
-        if (exit==1) {
-            break;
-        }
-    }
+    } while (!exit);
 }
 
 void game_dif_choose() {        //遊戲難度選則
-    int choose, error_in=0, over, i;
-    while (1) {
+    int choose, over, i;
+    do {
         printf("請問要玩怎樣的難度呢\n"
                "    簡單:1\n"
                "    普通:2\n"
@@ -223,21 +217,21 @@ void game_dif_choose() {        //遊戲難度選則
         fflush(stdin);  //清理輸入緩衝區
         switch (choose) {
             case 1:
-                set.lines=9;
-                set.cols=9;
-                set.landboom=10;
+                set.lines = 9;
+                set.cols = 9;
+                set.landboom = 10;
                 game_content();
                 break;
             case 2:
-                set.lines=16;
-                set.cols=16;
-                set.landboom=40;
+                set.lines = 16;
+                set.cols = 16;
+                set.landboom = 40;
                 game_content();
                 break;
             case 3:
-                set.lines=30;
-                set.cols=16;
-                set.landboom=99;
+                set.lines = 30;
+                set.cols = 16;
+                set.landboom = 99;
                 game_content();
                 break;
             case 4:
@@ -252,13 +246,13 @@ void game_dif_choose() {        //遊戲難度選則
                 system("cls");  //刷新螢幕
                 break;
         }
-        while (game.over==1) {
+        while (game.over) {
             gotoxy(60,2);
             printf("你還想要繼續玩嗎(Y/N) ");
-            for (i=0;i<10;i++) {
+            for (i = 0; i < 10; i++) {
                 putchar(' ');
             }
-            for (i=0;i<10;i++) {
+            for (i = 0; i < 10; i++) {
                 putchar('\b');
             }
             scanf("%c", &game.continue_q);
@@ -266,14 +260,14 @@ void game_dif_choose() {        //遊戲難度選則
             switch (game.continue_q) {
                 case 'y':
                 case 'Y':
-                    game.continue_q=1;
+                    game.continue_q = 1;
                     gotoxy(60,3);
                     printf("那就重新開始囉");
                     Sleep(1000);
                 break;
                 case 'n':
                 case 'N':
-                    over=1;
+                    over = 1;
                     gotoxy(60,3);
                     printf("那就掰掰囉");
                     Sleep(1000);
@@ -285,28 +279,24 @@ void game_dif_choose() {        //遊戲難度選則
                     Sleep(3000);
                     gotoxy(60,3);
                     color_set(7);
-                    for (i=0;i<14;i++) {
+                    for (i = 0; i < 14; i++) {
                         putchar(' ');
                     }
                 break;
             }
-            if (over==1||game.continue_q==1) {
+            if (over == 1||game.continue_q == 1) {
                 break;
             }
         }
-        if (game.continue_q==1) {
+        if (game.continue_q == 1) {
             system("cls");
         }
-        else if (over==1) {
-            break;
-        }
-
-    }
+    } while (over != 1);
 }
 
 void gotoxy(int x,int y) {  //指定座標(x和y從0開始算，所以減1，比較直觀)
     COORD c;
-    c.X=x-1;
-    c.Y=y-1;
+    c.X = x-1;
+    c.Y = y-1;
     SetConsoleCursorPosition (GetStdHandle(STD_OUTPUT_HANDLE), c);
 }

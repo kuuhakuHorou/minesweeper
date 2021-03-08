@@ -1,5 +1,12 @@
 #######################################################################################################################
 
+2.3.1:
+1. Remove #define *.
+2. Add enum bool instead of using numbers while comparing.
+3. Use calloc() instead of malloc().
+
+#######################################################################################################################
+
 2.3.0:
 1. Move some information in struct GAME to struct SET, and add new information in struct GAME.
 2. Add "play again?" when the game over.
