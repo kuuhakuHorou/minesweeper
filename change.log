@@ -1,5 +1,12 @@
 #######################################################################################################################
 
+2.3.2:
+1. Add some new functions to instead some repeated code.
+2. Add new enums to support new functions.
+3. Rename header file.
+
+#######################################################################################################################
+
 2.3.1:
 1. Remove #define *.
 2. Add enum bool instead of using numbers while comparing.
