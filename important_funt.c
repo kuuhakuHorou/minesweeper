@@ -7,7 +7,7 @@ void color_set(int color_num) {     //https://baike.baidu.com/item/SetConsoleTex
 }
 
 void degree_of_difficulty() {       //¦Û­qÃø«×
-    int i, choose, change;
+    int choose, change;
     bool exit = false, choose_exit = false, error = false;
     do {
         if (set.lines == 0) {

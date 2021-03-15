@@ -1,5 +1,11 @@
 #######################################################################################################################
 
+2.4.0:
+1. Use <stdbool.h> instead of "typedef enum {false, true} bool;".
+2. Simplify variable in functions.
+
+#######################################################################################################################
+
 2.3.2:
 1. Add some new functions to instead some repeated code.
 2. Add new enums to support new functions.

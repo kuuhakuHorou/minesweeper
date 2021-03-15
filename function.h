@@ -2,14 +2,13 @@
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>
+#include <stdbool.h>
 /*  #define LINES_EASY 9
     #define COLS_EASY 9
     #define LINES_NORMAL 16
     #define COLS_NORMAL 16
     #define LINES_HARD 30
     #define COLS_HARD 16 */
-
-typedef enum {false, true} bool;
 
 typedef enum {              //超出地圖       已標記位置
     OverRange, EnterError, OverCoordinate, MarkCoordinate
