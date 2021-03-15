@@ -1,11 +1,11 @@
 #include "function.h"
 
 void game_content() {   //遊戲內容
-    int i, j, mod, mod_choose;
+    int mod, mod_choose;
     game.over = false;
     game.error = false;
-    int *map = calloc((set.lines+2)*(set.cols+2), sizeof(int));  //地圖
-    int *map_mark = calloc(set.lines*set.cols, sizeof(int));     //標記地圖
+    int *map = (int*)calloc((set.lines+2)*(set.cols+2), sizeof(int));  //地圖
+    int *map_mark = (int*)calloc(set.lines*set.cols, sizeof(int));     //標記地圖
 /*  for (i=0;i<set.lines;i++) {
         for (j=0;j<set.cols;j++) {
             *(map_mark+set.cols*i+j)=0;
@@ -38,7 +38,7 @@ void game_content() {   //遊戲內容
                     mod_choose = 0;   //一開始沒輸入錯誤但後面有時，防止跳入上一個選則
                     Sleep(3000);
                     gotoxy(60,2);
-                    for (i = 0; i < 21; i++)
+                    for (int i = 0; i < 21; i++)
                         putchar(' ');
                     break;
             }
@@ -96,13 +96,13 @@ void game_start(int *map,int *map_mark) {     //遊戲開始設定
 
 void landboom_generate(int enter_x, int enter_y,int *map) {  //隨機生成地雷
     srand(time(0));
-    int i, j, produce_x, produce_y, landboom_num = 0;
+    int produce_x, produce_y, landboom_num = 0;
     int *p_map;
     do {
         produce_x = rand()%set.cols + 1;
         produce_y = rand()%set.lines + 1;
         p_map = map + map_location(produce_y,produce_x,Map);
-        if (*p_map != 20&&produce_x != enter_x&&produce_y != enter_y) {
+        if (*p_map != 20 && produce_x != enter_x && produce_y != enter_y) {
             *p_map = 20;   //20為地雷
             landboom_num++;
         }
@@ -158,6 +158,25 @@ void mod_choose_1(int *map,int *map_mark) {   //"踩"
         print_warning(MarkCoordinate);
         return;
     }
+    else if(*(map + map_location(guess_y,guess_x,Map)) < 10 && *(map + map_location(guess_y,guess_x,Map)) > 0) {
+        int flags = 0;
+        for (i = guess_y - 1; i <= guess_y + 1; i++) {
+            for (j = guess_x - 1; j <= guess_x + 1; j++) {
+                if (*(map_mark + map_location(i,j,Mark)) == 1) {
+                    flags++;
+                }
+            }
+        }
+        if (flags == *(map + map_location(guess_y,guess_x,Map))) {
+            for (i = guess_y - 1; i <= guess_y + 1; i++) {
+                for (j = guess_x - 1; j <= guess_x + 1; j++) {
+                    if (*(map + map_location(i,j,Map)) == 0) {
+                        landboom_tester(j,i,map);
+                    }
+                }
+            }
+        }
+    }
     else if (*(map + map_location(guess_y,guess_x,Map)) == 20) {
         for (i = 0; i < set.lines+2; i++) {
             for (j = 0;j < set.cols+2; j++) {
@@ -204,7 +223,7 @@ void mod_choose_1(int *map,int *map_mark) {   //"踩"
 }
 
 void mod_choose_2(int *map,int *map_mark) {   //標記
-    int i, mark_x, mark_y;
+    int mark_x, mark_y;
     int *p_mark;
     gotoxy(60,2);
     printf("請輸入你想標記哪(x y): ");
