@@ -1,5 +1,17 @@
 #######################################################################################################################
 
+2.5.0:
+1. Add the choice which same difficulty in next game.
+2. Fix print_warning().
+3. Add restart game.
+4. Enphasize sweeped landboom.
+5. Fix landboom_tester().
+6. Change the color of the interface.
+7. Move judgment of victory to isWin().
+8. Add new functions.
+
+#######################################################################################################################
+
 2.4.1:
 1. Add struct Coor instead of the variables of x & y.
 2. Fix some logic problem.

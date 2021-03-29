@@ -10,8 +10,15 @@ void clean_stdin(void) {  //清除輸入緩衝區
 
 void color_set(int color_num) {     //https://baike.baidu.com/item/SetConsoleTextAttribute 顏色對應值
     HANDLE hOut;
-    hOut=GetStdHandle(STD_OUTPUT_HANDLE);
+    hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hOut, color_num);
+}
+
+bool compare_coor(Coor t1, Coor t2) {
+    if (t1.x == t2.x && t1.y == t2.y) {
+        return true;
+    }
+    return false;
 }
 
 void degree_of_difficulty(void) {       //自訂難度
@@ -74,6 +81,8 @@ void degree_of_difficulty(void) {       //自訂難度
         }
         if (set.lines != 0 && set.cols != 0 && set.landboom != 0) {
             change = 0;
+            decide = '\0';
+            choose_exit = false;
             while (!choose_exit) {
                 gotoxy(30,4);
                 printf("有要調整的嗎?(Y/N) ");
@@ -132,59 +141,67 @@ void degree_of_difficulty(void) {       //自訂難度
     }
 }
 
-void gotoxy(int x,int y) {  //指定座標(x和y從0開始算，所以減1，比較直觀)
-    COORD c;
-    c.X = x-1;
-    c.Y = y-1;
-    SetConsoleCursorPosition (GetStdHandle(STD_OUTPUT_HANDLE), c);
-}
-
 void game_dif_choose(void) {        //遊戲難度選則
     int choose = 0,  i;
-    bool over = false, continue_q = false;
+    bool over = false, continue_q = false, first_play = true, error = false;
     MAP map;
+    reset();
     while (!over) {
-        reset();
-        printf("請問要玩怎樣的難度呢\n"
-               "    簡單:1\n"
-               "    普通:2\n"
-               "    困難:3\n"
-               "    自定義:4\n"
-               "  請輸入: ");
-        scanf("%d", &choose);
-        clean_stdin();
+        if (!game.restart) {
+            error = false;
+            printf("請問要玩怎樣的難度呢\n");
+            if (!first_play) {
+                printf("    原難度(包含自定義):0\n");
+            }
+            printf("    簡單:1\n"
+                   "    普通:2\n"
+                   "    困難:3\n"
+                   "    自定義:4\n"
+                   "  請輸入: ");
+            scanf("%d", &choose);
+            clean_stdin();
+        } else if (game.restart){
+            choose = 0;
+        }
         switch (choose) {
+            case 0:
+                reset_game();
+                break;
             case 1:
+                reset();
                 set.lines = 9;
                 set.cols = 9;
                 set.landboom = 10;
-                game_content(&map);
                 break;
             case 2:
+                reset();
                 set.lines = 16;
                 set.cols = 16;
                 set.landboom = 40;
-                game_content(&map);
                 break;
             case 3:
+                reset();
                 set.lines = 30;
                 set.cols = 16;
                 set.landboom = 99;
-                game_content(&map);
                 break;
             case 4:
+                reset();
                 degree_of_difficulty();
-                game_content(&map);
                 break;
             default:
-                color_set(252);
+                error = true;
+                color_set(0xfc);
                 printf("請不要亂輸入喔!\n");
-                color_set(7);
+                color_set(0x07);
                 Sleep(3000);    //延遲
                 system("cls");  //刷新螢幕
                 break;
         }
-        while (game.over) {
+        if (!error) {
+            game_content(&map);
+        }
+        while (game.over && !game.restart) {
             gotoxy(60,2);
             printf("你還想要繼續玩嗎(Y/N) ");
             print_space();
@@ -207,11 +224,11 @@ void game_dif_choose(void) {        //遊戲難度選則
                     break;
                 default:
                     gotoxy(60,3);
-                    color_set(252);
+                    color_set(0xfc);
                     printf("請不要亂輸入喔");
                     Sleep(3000);
                     gotoxy(60,3);
-                    color_set(7);
+                    color_set(0x07);
                     for (i = 0; i < 14; i++) {
                         putchar(' ');
                     }
@@ -222,68 +239,30 @@ void game_dif_choose(void) {        //遊戲難度選則
             }
         }
         if (continue_q) {
+            first_play = false;
             system("cls");
         }
     }
 }
 
-void print_space(void) {    //印空白(10個)
-    for (int i = 0; i < 10; i++) {
-        putchar(' ');
-    }
-    for (int i = 0; i < 10; i++) {
-        putchar('\b');
-    }
+void gotoxy(int x,int y) {  //指定座標(x和y從0開始算，所以減1，比較直觀)
+    COORD c;
+    c.X = x-1;
+    c.Y = y-1;
+    SetConsoleCursorPosition (GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
-void print_warning(Warning warn) {  //輸入錯誤警告
-    int i;
-    switch(warn) {
-        case OverRange:
-            gotoxy(30,6);
-            color_set(252);
-            printf("請不要超過範圍喔!");
-            Sleep(3000);
-            color_set(7);
-            gotoxy(30,6);
-            for (i = 0; i < 17; i++) {
-                putchar(' ');
-            }
+int location_value(MAP *map, Coor coor, Type type) { //計算地圖位置數值
+    int value = 0;
+    switch(type) {
+        case Map:
+            value = map->map[map_location(coor, type)];
             break;
-        case EnterError:
-            gotoxy(30,6);
-            color_set(252);
-            printf("請不要亂輸入喔!");
-            Sleep(3000);
-            color_set(7);
-            gotoxy(30,6);
-            for (i = 0; i < 15; i++) {
-                putchar(' ');
-            }
-            break;
-        case OverCoordinate:
-            gotoxy(60,3);
-            color_set(252);
-            printf("輸入錯誤!請重新輸入!!");
-            color_set(7);
-            game.error = true;
-            Sleep(3000);
-            gotoxy(60,3);
-            for (i = 0;i < 21; i++)
-                putchar(' ');
-            break;
-        case MarkCoordinate:
-            gotoxy(60,3);
-            color_set(252);
-            printf("你不能踩標記的地喔!");
-            color_set(7);
-            game.error = true;
-            Sleep(3000);
-            gotoxy(60,3);
-            for (i = 0; i < 21; i++)
-                putchar(' ');
+        case Mark:
+            value = map->mark[map_location(coor, type)];
             break;
     }
+    return value;
 }
 
 int map_location(Coor test, Type type) {  //計算陣列位置
@@ -308,25 +287,69 @@ bool over_range(Coor c) {   //計算有無超出地圖範圍
     }
 }
 
+void print_space(void) {    //印空白(10個)
+    int space_number = 10;
+    for (int i = 0; i < space_number; i++) {
+        putchar(' ');
+    }
+    for (int i = 0; i < space_number; i++) {
+        putchar('\b');
+    }
+}
+
+void print_warning(Warning warn) {  //輸入錯誤警告
+    int i, space_number = 30;
+    color_set(0xfc);
+    switch(warn) {
+        case OverRange:
+            gotoxy(30,6);
+            printf("請不要超過範圍喔!");
+            Sleep(3000);
+            gotoxy(30,6);
+            break;
+        case EnterError:
+            gotoxy(30,6);
+            printf("請不要亂輸入喔!");
+            Sleep(3000);
+            gotoxy(30,6);
+            break;
+        case OverCoordinate:
+            gotoxy(60,3);
+            printf("輸入錯誤!請重新輸入!!");
+            game.error = true;
+            Sleep(3000);
+            gotoxy(60,3);
+            break;
+        case MarkCoordinate:
+            gotoxy(60,3);
+            printf("你不能踩標記的地喔!");
+            game.error = true;
+            Sleep(3000);
+            gotoxy(60,3);
+            break;
+    }
+    color_set(0x07);
+    for (i = 0; i < space_number; i++) {
+        putchar(' ');
+    }
+}
+
 void reset(void) {  //重設遊戲參數
-    set.cols = 0;
-    set.lines = 0;
-    set.landboom = 0;
+    reset_game();
+    reset_set();
+}
+
+void reset_game(void) {     //重設game參數
     game.error = false;
     game.over = false;
+    game.restart = false;
+    game.sweep_landboom = false;
     game.flag = 0;
     game.continue_q = '\0';
 }
 
-int location_value(MAP *map, Coor coor, Type type) { //計算地圖位置數值
-    int value = 0;
-    switch(type) {
-        case Map:
-            value = map->map[map_location(coor, type)];
-            break;
-        case Mark:
-            value = map->mark[map_location(coor, type)];
-            break;
-    }
-    return value;
+void reset_set(void) {      //重設set參數
+    set.lines = 0;
+    set.cols = 0;
+    set.landboom = 0;
 }

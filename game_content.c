@@ -5,8 +5,6 @@ extern struct SET set;
 
 void game_content(MAP *map) {   //遊戲內容
     int mod = 0, mod_choose = 0;
-    game.over = false;
-    game.error = false;
     map->map = (int*)calloc((set.lines + 2) * (set.cols + 2), sizeof(int));  //地圖
     map->mark = (int*)calloc(set.lines * set.cols, sizeof(int));     //標記地圖
 /*  for (i=0;i<set.lines;i++) {
@@ -16,10 +14,11 @@ void game_content(MAP *map) {   //遊戲內容
     } */
     game_start(map);
     print_game(map);
+    is_win(map);
     while (!game.over) {
         if (!game.error) {
             gotoxy(60, 1);
-            printf("請輸入你想做什麼(1:\"踩\"，2:標記): ");
+            printf("請輸入你想做什麼(1:\"踩\", 2:標記, 3:重新開始): ");
             print_space();
             scanf("%d", &mod);
             clean_stdin();
@@ -32,11 +31,17 @@ void game_content(MAP *map) {   //遊戲內容
                     mod = 0;
                     mod_choose = 2;
                     break;
+                case 3:
+                    mod = 0;
+                    mod_choose = 0;
+                    game.over = true;
+                    game.restart = true;
+                    break;
                 default:
                     gotoxy(60, 2);
-                    color_set(252);
+                    color_set(0xfc);
                     printf("輸入錯誤!請重新輸入!!");
-                    color_set(7);
+                    color_set(0x07);
                     game.error = true;
                     mod_choose = 0;   //一開始沒輸入錯誤但後面有時，防止跳入上一個選則
                     Sleep(3000);
@@ -60,7 +65,7 @@ void game_content(MAP *map) {   //遊戲內容
                 mod_choose_2(map);
         }
     }
-    color_set(7);
+    color_set(0x07);
     gotoxy(60, 2);
     free(map->map);
     free(map->mark);
@@ -88,15 +93,44 @@ void game_start(MAP *map) {     //遊戲開始設定
         if (over_range(enter)) {
             error = true;
             gotoxy(60,2);
-            color_set(252);
+            color_set(0xfc);
             printf("請不要亂輸入喔!");
-            color_set(7);
+            color_set(0x07);
             Sleep(3000);
         }
     } while (error);
     map->map[map_location(enter, Map)] = 10;
     landboom_generate(enter, map->map);    //生成地雷
     landboom_tester(enter, map);
+}
+
+void is_win(MAP *map) {  //測試是否贏了
+    int untreated_places = 0;  //沒踩過的地
+    Coor loop;
+    for (loop.y = 0; loop.y < set.lines + 2; loop.y++) {
+        for (loop.x = 0; loop.x < set.cols + 2; loop.x++) {
+            if (location_value(map, loop, Map) == 0) {
+                untreated_places++;
+            }
+            else if (location_value(map, loop, Map) < 20) {
+                continue;   //踩過且不算地雷處
+            }
+        }
+    }
+    if (untreated_places == 0) {
+        for (loop.y = 0; loop.y < set.lines + 2; loop.y++) {
+            for (loop.x = 0; loop.x < set.cols + 2; loop.x++) {
+                if (location_value(map, loop, Map) == 20)
+                    map->map[map_location(loop, Map)] = 30;  //顯現地雷處
+            }
+        }
+        print_game(map);
+        gotoxy(60,1);
+        color_set(0xe0);
+        printf("你贏了");
+        game.over = true;
+        return;
+    }
 }
 
 void landboom_generate(Coor test, int *map) {  //隨機生成地雷
@@ -109,7 +143,7 @@ void landboom_generate(Coor test, int *map) {  //隨機生成地雷
         produce.y = rand() % set.lines + 1;
         p_map = map + map_location(produce, Map);
         if (*p_map != 20) {
-            if (produce.x == test.x && produce.y == test.y) {
+            if (compare_coor(produce, test)) {
                 continue;
             }
             *p_map = 20;   //20為地雷
@@ -129,12 +163,20 @@ void landboom_generate(Coor test, int *map) {  //隨機生成地雷
 void landboom_tester(Coor test, MAP *map) { //測試旁邊八格地雷
     Coor loop;
     int landboom = 0; //重算地雷數
-
+    if (location_value(map, test, Mark) != 0 && location_value(map, test, Map) > 0)
+        return;
+    if (location_value(map, test, Map) == 99) //不踩地圖邊界
+        return;
+    if (location_value(map, test, Map) == 20) {
+        map->map[map_location(test, Map)] = 22;
+        game.sweep_landboom = true;
+        return;
+    }
     for (loop.y = test.y - 1; loop.y <= test.y + 1; loop.y++) {        //測試周邊地雷
         for (loop.x = test.x - 1; loop.x <= test.x + 1; loop.x++) {
-            if (loop.x == test.x && loop.y == test.y)     //踩的那格不用算
+            if (compare_coor(test, loop))     //踩的那格不用算
                 continue;
-            else if (location_value(map, loop, Map) == 20)
+            else if (location_value(map, loop, Map) == 20 || location_value(map, loop, Map) == 22)
                 landboom++;
         }
     }
@@ -154,23 +196,20 @@ void landboom_tester(Coor test, MAP *map) { //測試旁邊八格地雷
 
 void mod_choose_1(MAP *map) {   //"踩"
     Coor guess = {0, 0}, loop;
-    int val_map, val_mark, untreated_places;
     gotoxy(60, 2);
     printf("請輸入你想踩哪(x y): ");
     print_space();
     scanf("%d%d", &guess.y, &guess.x);
     clean_stdin();
-    val_map = location_value(map, guess, Map);
-    val_mark = location_value(map, guess, Mark);
     if (over_range(guess)) {    //超出地雷範圍
         print_warning(OverCoordinate);
         return;
     }
-    else if (val_mark == 1) {
+    else if (location_value(map, guess, Mark) == 1) {   //踩標記
         print_warning(MarkCoordinate);
         return;
     }
-    else if(val_map < 10 && val_map > 0) {
+    else if(location_value(map, guess, Map) < 10 && location_value(map, guess, Map) > 0) {   //踩數字(九宮格地雷數)
         int flags = 0;
         for (loop.y = guess.y - 1; loop.y <= guess.y + 1; loop.y++) {
             for (loop.x = guess.x - 1; loop.x <= guess.x + 1; loop.x++) {
@@ -179,59 +218,35 @@ void mod_choose_1(MAP *map) {   //"踩"
                 }
             }
         }
-        if (flags == val_map) {
+        if (flags == location_value(map, guess, Map)) {
             for (loop.y = guess.y - 1; loop.y <= guess.y + 1; loop.y++) {
                 for (loop.x = guess.x - 1; loop.x <= guess.x + 1; loop.x++) {
-                    if (location_value(map, loop, Map) == 0) {
-                        landboom_tester(loop, map);
-                    }
+                    landboom_tester(loop, map);
                 }
             }
         }
     }
-    else if (val_map == 20) {
+    if (location_value(map, guess, Map) == 20 || game.sweep_landboom) {    //踩到地雷處
+        if (!game.sweep_landboom)
+            map->map[map_location(guess, Map)] = 22; //明確顯示踩到的地雷
         for (loop.y = 0; loop.y < set.lines + 2; loop.y++) {
             for (loop.x = 0; loop.x < set.cols + 2; loop.x++) {
                 if (location_value(map, loop, Map) == 20)
                     map->map[map_location(loop, Map)] += 1;  //輸了以顯示地雷處
-                else if (location_value(map, loop, Map) == 1 && location_value(map, loop, Map) < 20)
+                else if (location_value(map, loop, Mark) == 1 && location_value(map, loop, Map) < 20)
                     map->mark[map_location(loop, Mark)] = 2;   //標記錯誤，把錯誤顯現出來
             }
         }
         print_game(map);
         gotoxy(60,1);
-        color_set(192);
+        color_set(0xc0);
         printf("你輸了");
         game.over = true;
         return;
     }
     landboom_tester(guess, map);
     print_game(map);
-    untreated_places = 0;  //重算沒踩過的地
-    for (loop.y = 0; loop.y < set.lines + 2; loop.y++) {
-        for (loop.x = 0; loop.x < set.cols + 2; loop.x++) {
-            if (location_value(map, loop, Map) == 0) {
-                untreated_places++;
-            }
-            else if (location_value(map, loop, Map) < 20) {
-                continue;   //踩過且不算地雷處
-            }
-        }
-    }
-    if (untreated_places == 0) {
-        for (loop.y = 0; loop.y < set.lines + 2; loop.y++) {
-            for (loop.x = 0; loop.x < set.cols + 2; loop.x++) {
-                if (location_value(map, loop, Map) == 20)
-                    map->map[map_location(loop, Map)] = 30; //顯現地雷處
-            }
-        }
-        print_game(map);
-        gotoxy(60,1);
-        color_set(224);
-        printf("你贏了");
-        game.over = true;
-        return;
-    }
+    is_win(map);
 }
 
 void mod_choose_2(MAP *map) {   //標記
@@ -243,7 +258,7 @@ void mod_choose_2(MAP *map) {   //標記
     print_space();
     scanf("%d%d", &mark.y, &mark.x);
     clean_stdin();
-    if (over_range(mark)) {//超出地雷範圍
+    if (over_range(mark)) { //超出地雷範圍
         print_warning(OverCoordinate);
         return;
     }
@@ -251,11 +266,11 @@ void mod_choose_2(MAP *map) {   //標記
     if (val_map == 20 || val_map == 0) {
         p_mark = &map->mark[map_location(mark, Mark)];
         if (*p_mark == 0) {
-            *p_mark = 1; //標記
+            *p_mark = 1;    //標記
             game.flag++;
         }
         else if (*p_mark == 1) {
-            *p_mark = 0; //清除標記
+            *p_mark = 0;    //清除標記
             game.flag--;
         }
     }
@@ -305,52 +320,60 @@ void print_game(MAP *map) { //介面
             val_map = location_value(map, loop, Map);
             val_mark = location_value(map, loop, Mark);
             if (val_map == 99) {
-                color_set(51);
+                color_set(0x33);
                 printf("■");         //邊界
             }
+            else if (val_mark == 2) {
+                color_set(0x0c);
+                printf("Χ");     //標記錯誤顯現
+            }
             else if (val_map == 10) {
-                color_set(119);
+                color_set(0x88);
                 printf("■");    //踩過的空地
             }
             else if (val_map == 0 || val_map == 20) {
                 if (val_mark == 0) {
-                    color_set(135);
+                    color_set(0x87);
                     printf("■");     //還沒踩過的地面&地雷
                 }
                 else if (val_mark == 1) {
-                    color_set(12);
+                    color_set(0x8c);
                     printf("◢");    //地雷標記顯現
                 }
                 else if (val_mark == 2) {
-                    color_set(12);
+                    color_set(0x8c);
                     printf("Χ");     //標記錯誤顯現
                 }
             }
             else if (val_map < 10) {
-                color_set(23);
+                color_set(0x8b);
                 printf(" %d", val_map); //踩過且旁邊有地雷，顯現地雷數
             }
             else if (val_map == 21) {
                 if (val_mark == 0) {
-                    color_set(14);
+                    color_set(0x8e);
                     printf("※");    //全場地雷處
                 }
                 else if (val_mark == 1) {
-                    color_set(12);
+                    color_set(0x8c);
                     printf("◢");    //地雷標記顯現
                 }
+            }
+            else if (val_map == 22) {
+                color_set(0xce);
+                printf("※");    //踩到地雷處
             }
             else if (val_map == 30) {
                 if (val_mark == 0) {
-                    color_set(11);
+                    color_set(0x8e);
                     printf("⊕");    //過關顯示地雷
                 }
                 else if (val_mark == 1) {
-                    color_set(12);
+                    color_set(0x8c);
                     printf("◢");    //地雷標記顯現
                 }
             }
-            color_set(7);
+            color_set(0x07);
         }
     }
     for (int i = 1; i <= 36; i++) {
