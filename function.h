@@ -21,6 +21,8 @@ typedef enum {
 struct GAME{
     bool error;  //遊戲錯誤(輸入)
     bool over;   //遊戲結束
+    bool restart;   //遊戲重新開始
+    bool sweep_landboom;    //踩到炸彈
     int flag;   //遊戲中旗子數量
     char continue_q;     //遊戲繼續詢問
 };
@@ -44,19 +46,23 @@ typedef struct COOR {
 //重要函式(important_funt.c)
 void clean_stdin(void); //清除輸入緩衝區
 void color_set(int);    //改變顏色
-void degree_of_difficulty(void);
+bool compare_coor(Coor, Coor);   //
+void degree_of_difficulty(void);    //自訂地圖資訊
 void game_dif_choose(void); //遊戲困難度選則
 void gotoxy(int, int);  //指定座標
-void print_space(void); //印空白(10個)
-void print_warning(Warning);    //警告
+int location_value(MAP *, Coor, Type);  //計算地圖位置數值
 int map_location(Coor, Type);  //地圖座標
 bool over_range(Coor);   //計算有無超出地圖範圍
+void print_space(void); //印空白(10個)
+void print_warning(Warning);    //警告
 void reset(void);       //重製遊戲參數
-int location_value(MAP *, Coor, Type);  //計算地圖位置數值
+void reset_game(void);  //重設game參數
+void reset_set(void);   //重設set參數
 
 //遊戲內容(game_content.c)
 void game_content(MAP *);    //遊戲內容
 void game_start(MAP *);  //設定邊界
+void is_win(MAP *);  //測試是否贏了
 void landboom_generate(Coor, int *);   //隨機生成地雷
 void landboom_tester(Coor, MAP *);   //測試旁邊八格地雷
 void mod_choose_1(MAP *);        //"踩"
