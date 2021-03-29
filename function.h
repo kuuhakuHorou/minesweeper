@@ -23,28 +23,42 @@ struct GAME{
     bool over;   //遊戲結束
     int flag;   //遊戲中旗子數量
     char continue_q;     //遊戲繼續詢問
-} game;
+};
 
 struct SET{
     int lines;  //地圖幾行
     int cols;   //地圖幾列
     int landboom;   //地雷數量
-} set;
+};
+
+typedef struct MAP {
+    int* map;    //地圖
+    int* mark;   //標記地圖
+} MAP;
+
+typedef struct COOR {
+    int x;   //x
+    int y;   //y
+} Coor;
 
 //重要函式(important_funt.c)
+void clean_stdin(void); //清除輸入緩衝區
 void color_set(int);    //改變顏色
 void degree_of_difficulty(void);
 void game_dif_choose(void); //遊戲困難度選則
+void gotoxy(int, int);  //指定座標
 void print_space(void); //印空白(10個)
 void print_warning(Warning);    //警告
-int map_location(int,int,Type);  //地圖座標
-void gotoxy(int,int);   //指定座標
+int map_location(Coor, Type);  //地圖座標
+bool over_range(Coor);   //計算有無超出地圖範圍
+void reset(void);       //重製遊戲參數
+int location_value(MAP *, Coor, Type);  //計算地圖位置數值
 
 //遊戲內容(game_content.c)
-void game_content(void);    //遊戲內容
-void game_start(int *,int *);  //設定邊界
-void landboom_generate(int,int,int *);   //隨機生成地雷
-void landboom_tester(int,int,int *);   //測試旁邊八格地雷
-void mod_choose_1(int *,int *);        //"踩"
-void mod_choose_2(int *,int *);        //標記
-void print_game(int *,int *);          //介面
+void game_content(MAP *);    //遊戲內容
+void game_start(MAP *);  //設定邊界
+void landboom_generate(Coor, int *);   //隨機生成地雷
+void landboom_tester(Coor, MAP *);   //測試旁邊八格地雷
+void mod_choose_1(MAP *);        //"踩"
+void mod_choose_2(MAP *);        //標記
+void print_game(MAP *);          //介面

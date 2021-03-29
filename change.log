@@ -1,5 +1,13 @@
 #######################################################################################################################
 
+2.4.1:
+1. Add struct Coor instead of the variables of x & y.
+2. Fix some logic problem.
+3. Add function "clean_stdin()", it's used to replace fflush(stdin).
+4. Add some new functions.
+
+#######################################################################################################################
+
 2.4.0:
 1. Use <stdbool.h> instead of "typedef enum {false, true} bool;".
 2. Simplify variable in functions.
