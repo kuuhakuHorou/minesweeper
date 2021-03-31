@@ -1,5 +1,19 @@
 #######################################################################################################################
 
+3.0.0:
+1. Add interactive mod, now users can choose both of one.
+2. Change some names of functions.
+3. Fix landboom_tester() and mapLocation().
+4. Add keyboard hint for interactive mod.
+5. Change some text positions because of keyboard hint.
+6. Enphasize player location on interface.
+7. Change the color of border.
+8. Add "restart same difficulty?".
+9. Declare struct SET set in struct GAME, and remove globla variable struct SET set.
+10. Hide cursor while interactive mod.
+
+#######################################################################################################################
+
 2.5.0:
 1. Add the choice which same difficulty in next game.
 2. Fix print_warning().
@@ -47,8 +61,8 @@
 #######################################################################################################################
 
 2.2.0:
-1. Add customzied difficulty, now it can custom the information of map.
-2. Adjust interface.
+1. Add customzied difficulty, now it can custom the information of map
+2. Adjust interface
 
 #######################################################################################################################
 
