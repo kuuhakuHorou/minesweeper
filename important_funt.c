@@ -1,6 +1,5 @@
 #include "function.h"
 
-struct SET set;
 struct GAME game;
 
 void clean_stdin(void) {  //清除輸入緩衝區
@@ -8,13 +7,13 @@ void clean_stdin(void) {  //清除輸入緩衝區
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-void color_set(int color_num) {     //https://baike.baidu.com/item/SetConsoleTextAttribute 顏色對應值
+void color_set(int color_num) {     //設定輸出顏色
     HANDLE hOut;
     hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hOut, color_num);
 }
 
-bool compare_coor(Coor t1, Coor t2) {
+bool compare_coor(Coor t1, Coor t2) {    //比較座標是否一樣
     if (t1.x == t2.x && t1.y == t2.y) {
         return true;
     }
@@ -22,29 +21,30 @@ bool compare_coor(Coor t1, Coor t2) {
 }
 
 void degree_of_difficulty(void) {       //自訂難度
-    int choose, change;
+    int choose, change, max_landboom;
     char decide = '\0';
     bool exit = false, choose_exit = false, error = false;
     while (!exit) {
-        if (set.lines == 0) {
+        if (game.set.lines == 0) {
             choose = 1;
         }
-        else if (set.cols == 0) {
+        else if (game.set.cols == 0) {
             choose = 2;
         }
-        else if (set.landboom == 0) {
+        else if (game.set.landboom == 0) {
+            max_landboom = (game.set.lines - 1) * (game.set.cols - 1);
             choose = 3;
         }
         switch (choose) {
             case 1:
                 do {
                     error = false;
-                    gotoxy(30,1);
+                    gotoxy(30, 1);
                     printf("請輸入長度x(最小9,最大30): ");
                     print_space();
-                    scanf("%d", &set.lines);
+                    scanf("%d", &game.set.lines);
                     clean_stdin();
-                    if (set.lines < 9 || set.lines > 30) {
+                    if (game.set.lines < 9 || game.set.lines > 30) {
                         error = true;
                         print_warning(OverRange);
                     }
@@ -53,12 +53,12 @@ void degree_of_difficulty(void) {       //自訂難度
             case 2:
                 do {
                     error = false;
-                    gotoxy(30,2);
+                    gotoxy(30, 2);
                     printf("請輸入寬度y(最小9,最大24): ");
                     print_space();
-                    scanf("%d", &set.cols);
+                    scanf("%d", &game.set.cols);
                     clean_stdin();
-                    if (set.cols < 9 || set.cols > 24) {
+                    if (game.set.cols < 9 || game.set.cols > 24) {
                         error = true;
                         print_warning(OverRange);
                     }
@@ -67,24 +67,23 @@ void degree_of_difficulty(void) {       //自訂難度
             case 3:
                 do {
                     error = false;
-                    gotoxy(30,3);
-                    printf("請輸入炸彈數(最小10,最大%-3d): ", (set.lines-1) * (set.cols-1));
+                    gotoxy(30, 3);
+                    printf("請輸入炸彈數(最小10,最大%-3d): ", max_landboom);
                     print_space();
-                    scanf("%d", &set.landboom);
+                    scanf("%d", &game.set.landboom);
                     clean_stdin();
-                    if (set.landboom < 10 || set.landboom > (set.lines-1) * (set.cols-1)) {
+                    if (game.set.landboom < 10 || game.set.landboom > max_landboom) {
                         error = true;
                         print_warning(OverRange);
                     }
                 } while (error);
                 break;
         }
-        if (set.lines != 0 && set.cols != 0 && set.landboom != 0) {
-            change = 0;
-            decide = '\0';
+        if (game.set.lines != 0 && game.set.cols != 0 && game.set.landboom != 0) {
             choose_exit = false;
             while (!choose_exit) {
-                gotoxy(30,4);
+                decide = '\0';
+                gotoxy(30, 4);
                 printf("有要調整的嗎?(Y/N) ");
                 print_space();
                 scanf("%c", &decide);
@@ -93,8 +92,9 @@ void degree_of_difficulty(void) {       //自訂難度
                     case 'y':
                     case 'Y':
                         do {
+                            change = 0;
                             error = false;
-                            gotoxy(30,5);
+                            gotoxy(30, 5);
                             printf("請問需要調整哪裡呢?(1:長度 2:寬度 3:地雷數) ");
                             print_space();
                             scanf("%d", &change);
@@ -102,19 +102,19 @@ void degree_of_difficulty(void) {       //自訂難度
                             switch (change) {
                                 case 1:
                                     change = 0;
-                                    set.lines = 0;
-                                    set.landboom = 0;
+                                    game.set.lines = 0;
+                                    game.set.landboom = 0;
                                     choose_exit = true;
                                     break;
                                 case 2:
                                     change = 0;
-                                    set.cols = 0;
-                                    set.landboom = 0;
+                                    game.set.cols = 0;
+                                    game.set.landboom = 0;
                                     choose_exit = true;
                                     break;
                                 case 3:
                                     change = 0;
-                                    set.landboom = 0;
+                                    game.set.landboom = 0;
                                     choose_exit = true;
                                     break;
                                 default:
@@ -126,7 +126,7 @@ void degree_of_difficulty(void) {       //自訂難度
                         break;
                     case 'n':
                     case 'N':
-                        gotoxy(30,6);
+                        gotoxy(30, 6);
                         printf("那就開始遊戲囉");
                         Sleep(1000);
                         choose_exit = true;
@@ -144,6 +144,8 @@ void degree_of_difficulty(void) {       //自訂難度
 void game_dif_choose(void) {        //遊戲難度選則
     int choose = 0,  i;
     bool over = false, continue_q = false, first_play = true, error = false;
+    bool dif_restart = false;
+    char restart = '\0';
     MAP map;
     reset();
     while (!over) {
@@ -169,21 +171,21 @@ void game_dif_choose(void) {        //遊戲難度選則
                 break;
             case 1:
                 reset();
-                set.lines = 9;
-                set.cols = 9;
-                set.landboom = 10;
+                game.set.lines = 9;
+                game.set.cols = 9;
+                game.set.landboom = 10;
                 break;
             case 2:
                 reset();
-                set.lines = 16;
-                set.cols = 16;
-                set.landboom = 40;
+                game.set.lines = 16;
+                game.set.cols = 16;
+                game.set.landboom = 40;
                 break;
             case 3:
                 reset();
-                set.lines = 30;
-                set.cols = 16;
-                set.landboom = 99;
+                game.set.lines = 30;
+                game.set.cols = 16;
+                game.set.landboom = 99;
                 break;
             case 4:
                 reset();
@@ -200,9 +202,48 @@ void game_dif_choose(void) {        //遊戲難度選則
         }
         if (!error) {
             game_content(&map);
+            continue_q = false;
+            restart = '\0';
+            dif_restart = false;
         }
-        while (game.over && !game.restart) {
-            gotoxy(60,2);
+        while (!dif_restart) {
+            bool isRestart = true;
+            gotoxy(60, 5);
+            printf("你要重玩此難度嗎(Y/N) ");
+            print_space();
+            scanf("%c", &restart);
+            clean_stdin();
+            switch (restart) {
+                case 'y':
+                case 'Y':
+                    game.restart = true;
+                    dif_restart = true;
+                    gotoxy(60, 6);
+                    printf("那就重新開始");
+                    Sleep(1000);
+                    break;
+                case 'n':
+                case 'N':
+                    isRestart = false;
+                    break;
+                default:
+                    gotoxy(60, 6);
+                    color_set(0xfc);
+                    printf("請不要亂輸入喔");
+                    Sleep(3000);
+                    gotoxy(60, 6);
+                    color_set(0x07);
+                    for (i = 0; i < 14; i++) {
+                        putchar(' ');
+                    }
+                    break;
+            }
+            if (!isRestart) {
+                break;
+            }
+        }
+        while (game.over && !game.restart && !over && !continue_q) {
+            gotoxy(60, 6);
             printf("你還想要繼續玩嗎(Y/N) ");
             print_space();
             scanf("%c", &game.continue_q);
@@ -211,31 +252,28 @@ void game_dif_choose(void) {        //遊戲難度選則
                 case 'y':
                 case 'Y':
                     continue_q = true;
-                    gotoxy(60,3);
+                    gotoxy(60, 7);
                     printf("那就重新開始");
                     Sleep(1000);
                     break;
                 case 'n':
                 case 'N':
                     over = true;
-                    gotoxy(60,3);
+                    gotoxy(60, 7);
                     printf("下次再見");
                     Sleep(1000);
                     break;
                 default:
-                    gotoxy(60,3);
+                    gotoxy(60, 7);
                     color_set(0xfc);
                     printf("請不要亂輸入喔");
                     Sleep(3000);
-                    gotoxy(60,3);
+                    gotoxy(60, 7);
                     color_set(0x07);
                     for (i = 0; i < 14; i++) {
                         putchar(' ');
                     }
                     break;
-            }
-            if (over || continue_q) {
-                break;
             }
         }
         if (continue_q) {
@@ -246,10 +284,14 @@ void game_dif_choose(void) {        //遊戲難度選則
 }
 
 void gotoxy(int x,int y) {  //指定座標(x和y從0開始算，所以減1，比較直觀)
-    COORD c;
-    c.X = x-1;
-    c.Y = y-1;
-    SetConsoleCursorPosition (GetStdHandle(STD_OUTPUT_HANDLE), c);
+    COORD c = { (SHORT)(x - 1), (SHORT)(y - 1)};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+}
+
+void is_hide_cursor(bool isHide) {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO info = {1, !isHide};
+    SetConsoleCursorInfo(hOut, &info);
 }
 
 int location_value(MAP *map, Coor coor, Type type) { //計算地圖位置數值
@@ -266,25 +308,24 @@ int location_value(MAP *map, Coor coor, Type type) { //計算地圖位置數值
 }
 
 int map_location(Coor test, Type type) {  //計算陣列位置
-    int location;
+    int location = 0;
     switch (type) {
         case Map:
-            location = (set.cols + 1) * test.y + test.x;
+            location = (game.set.cols + 1) * test.y + test.x;
             break;
         case Mark:
-            location = set.cols * (test.y - 1) + (test.x - 1);
+            if (!over_range(test))
+                location = game.set.cols * (test.y - 1) + (test.x - 1);
             break;
     }
     return location;
 }
 
 bool over_range(Coor c) {   //計算有無超出地圖範圍
-    if (c.x < 1 || c.x > set.cols || c.y < 1 || c.y > set.lines) {
+    if (c.x < 1 || c.x > game.set.cols || c.y < 1 || c.y > game.set.lines) {
         return true;
     }
-    else {
-        return false;
-    }
+    return false;
 }
 
 void print_space(void) {    //印空白(10個)
@@ -302,30 +343,30 @@ void print_warning(Warning warn) {  //輸入錯誤警告
     color_set(0xfc);
     switch(warn) {
         case OverRange:
-            gotoxy(30,6);
+            gotoxy(30, 6);
             printf("請不要超過範圍喔!");
             Sleep(3000);
-            gotoxy(30,6);
+            gotoxy(30, 6);
             break;
         case EnterError:
-            gotoxy(30,6);
+            gotoxy(30, 6);
             printf("請不要亂輸入喔!");
             Sleep(3000);
-            gotoxy(30,6);
+            gotoxy(30, 6);
             break;
         case OverCoordinate:
-            gotoxy(60,3);
+            gotoxy(60, 7);
             printf("輸入錯誤!請重新輸入!!");
             game.error = true;
             Sleep(3000);
-            gotoxy(60,3);
+            gotoxy(60, 7);
             break;
         case MarkCoordinate:
-            gotoxy(60,3);
+            gotoxy(60, 7);
             printf("你不能踩標記的地喔!");
             game.error = true;
             Sleep(3000);
-            gotoxy(60,3);
+            gotoxy(60, 7);
             break;
     }
     color_set(0x07);
@@ -344,12 +385,13 @@ void reset_game(void) {     //重設game參數
     game.over = false;
     game.restart = false;
     game.sweep_landboom = false;
+    game.exit = false;
     game.flag = 0;
     game.continue_q = '\0';
 }
 
 void reset_set(void) {      //重設set參數
-    set.lines = 0;
-    set.cols = 0;
-    set.landboom = 0;
+    game.set.lines = 0;
+    game.set.cols = 0;
+    game.set.landboom = 0;
 }
