@@ -1,3 +1,6 @@
+#ifndef _FUNCTION_H_
+#define _FUNCTION_H_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -14,13 +17,26 @@ typedef enum {
     Map, Mark
 } Type;
 
-struct SET{
+typedef enum {
+    NoSweep = 0,    //未踩過的地
+    NoFlag = 0,     //沒有標記
+    Flag = 1,       //有標記
+    WrongFlag = 2,  //錯誤標記
+    Space = 10,     //踩過的空地
+    Landboom = 20,  //地雷
+    LoseLandboom = 21,  //輸了的地雷
+    SweepLandboom = 22, //踩到的地雷
+    WinLandboom = 30,   //贏了的地雷
+    Border = 99,    //邊界
+} Map_Information;
+
+struct SET {
     int lines;  //地圖幾行
     int cols;   //地圖幾列
     int landboom;   //地雷數量
 };
 
-struct GAME{
+struct GAME {
     bool error;  //遊戲錯誤(輸入)
     bool over;   //遊戲結束
     bool restart;   //遊戲重新開始
@@ -32,8 +48,8 @@ struct GAME{
 };
 
 typedef struct MAP {
-    int* map;    //地圖
-    int* mark;   //標記地圖
+    int *map;    //地圖
+    int *mark;   //標記地圖
 } MAP;
 
 typedef struct COOR {
@@ -70,3 +86,5 @@ bool sweep(MAP *, bool);    //"踩"
 bool map_mark(MAP *, bool);    //標記
 void print_game(MAP *, bool);      //介面
 void text_mod(MAP *);     //文字模式
+
+#endif

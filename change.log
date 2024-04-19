@@ -1,5 +1,11 @@
 #######################################################################################################################
 
+3.0.1:
+1. Use enum Map_Information instead of numbers.
+2. Fix print_game().
+
+#######################################################################################################################
+
 3.0.0:
 1. Add interactive mod, now users can choose both of one.
 2. Change some names of functions.
@@ -61,8 +67,8 @@
 #######################################################################################################################
 
 2.2.0:
-1. Add customzied difficulty, now it can custom the information of map
-2. Adjust interface
+1. Add customzied difficulty, now it can custom the information of map.
+2. Adjust interface.
 
 #######################################################################################################################
 

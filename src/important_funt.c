@@ -284,7 +284,7 @@ void game_dif_choose(void) {        //遊戲難度選則
 }
 
 void gotoxy(int x,int y) {  //指定座標(x和y從0開始算，所以減1，比較直觀)
-    COORD c = { (SHORT)(x - 1), (SHORT)(y - 1)};
+    COORD c = {(SHORT)(x - 1), (SHORT)(y - 1)};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
